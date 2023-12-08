@@ -19,7 +19,7 @@ class FaviconGenerator < Rails::Generators::Base
     response = send_post_request(payload, timeout)
 
     zip = response['favicon_generation_result']['favicon']['package_url']
-    favicon_folder_path = ['app/assets/images', namespace, 'favicon'].distinct.join('/')
+    favicon_folder_path = ['app/assets/images', namespace, 'favicon'].compact.join('/')
     FileUtils.mkdir_p(favicon_folder_path)
 
     Dir.mktmpdir 'rfg' do |tmp_dir|
@@ -31,7 +31,7 @@ class FaviconGenerator < Rails::Generators::Base
           content = replace_url_by_asset_path content
           new_ext = '.erb'
         end
-        create_file "#{favicon_folder_path}#{File.basename file}#{new_ext}", content
+        create_file "#{favicon_folder_path}/#{File.basename file}#{new_ext}", content
       end
     end
 
