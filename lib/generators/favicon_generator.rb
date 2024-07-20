@@ -27,7 +27,7 @@ class FaviconGenerator < Rails::Generators::Base
       Dir["#{tmp_dir}/*.*"].each do |file|
         content = File.binread(file)
         new_ext = ''
-        if ['.json', '.xml', '.webmanifest'].include? File.extname(file)
+        if ['.json', '.xml'].include? File.extname(file)
           content = replace_url_by_asset_path content
           new_ext = '.erb'
         end
@@ -35,12 +35,15 @@ class FaviconGenerator < Rails::Generators::Base
       end
     end
 
-    # FIXME: FIXME:
-    create_file "app/views/application/_favicon.html.erb",
+    favicon_html_erb_folder = namespace.nil? ? "application" : namespace
+    create_file "app/views/#{favicon_html_erb_folder}/_favicon.html.erb",
       replace_url_by_asset_path(response['favicon_generation_result']['favicon']['html_code'])
 
-    create_file "config/initializers/web_app_manifest.rb",
-      File.read(File.dirname(__FILE__) + '/web_app_manifest_initializer.txt')
+    web_app_manifest_path = "config/initializers/web_app_manifest.rb"
+    unless File.exist? web_app_manifest_path
+      create_file web_app_manifest_path,
+        File.read(File.dirname(__FILE__) + '/web_app_manifest_initializer.txt')
+    end
   end
 
   private
